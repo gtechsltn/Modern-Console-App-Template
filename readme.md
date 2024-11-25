@@ -1,5 +1,8 @@
 
-# Console App
+# Console App in .NET 9
++ https://github.com/gtechsltn/NET9_ConsoleApp
++ https://github.com/gtechsltn/Modern-Console-App-Template
+
 ```
 dotnet new console -n ConsoleApp --use-program-main
 cd .\ConsoleApp\
@@ -73,17 +76,17 @@ class MyApp
 ### appsettings.json
 ```
 {
-  "App": {
-    "Value1": "A",
-    Value2": 1
-  }
+    "App": {
+        "Value1": "A",
+        Value2": 1
+    }
 }
 ```
 
 ### Now open your ConsoleApp.csproj file with an editor and add the following block before the </Project> statement at the bottom:
 ```
 <ItemGroup>
-	<Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
 </ItemGroup>
 ```
 
