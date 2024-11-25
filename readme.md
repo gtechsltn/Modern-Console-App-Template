@@ -3,74 +3,79 @@
 ```
 dotnet new console -n ConsoleApp --use-program-main
 cd .\ConsoleApp\
+dotnet add package Microsoft.Extensions.Configuration
 dotnet add package Microsoft.Extensions.DependencyInjection
 dotnet add package Microsoft.Extensions.Hosting
+dotnet add package Microsoft.Extensions.Logging
 ```
 
 ```
 public interface IMyLogic
 {
-	void Say(string message);
+  void Say(string message);
 }
 
 public class MyLogic : IMyLogic
 {
-	public void Say(string message)
-	{
-		Console.WriteLine(message);
-	}
+  public void Say(string message)
+  {
+    Console.WriteLine(message);
+  }
 }
 
 class MyApp
 {
-	private ILogger<MyApp> _logger;
-	private IConfiguration _config;
-	private IMyLogic _logic;
+  private ILogger<MyApp> _logger;
+  private IConfiguration _config;
+  private IMyLogic _logic;
 
-	public MyApp(ILogger<MyApp> logger, IConfiguration config, IMyLogic logic)
-	{
-		_logger = logger;
-		_config = config;
-		_logic = logic;
-	}
+  public MyApp(ILogger<MyApp> logger, IConfiguration config, IMyLogic logic)
+  {
+    _logger = logger;
+    _config = config;
+    _logic = logic;
+  }
 
-	public Task StartAsync()
-	{
-		_logger.LogInformation(_config["App:Value1"]);
-		_logic.Say("Hello World!");
-		return Task.CompletedTask;
-	}
+  public Task StartAsync()
+  {
+    _logger.LogInformation(_config["App:Value1"]);
+    _logic.Say("Hello World!");
+    return Task.CompletedTask;
+  }
 }
 
 namespace ConsoleApp;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 class Program
 {
-	static async Task Main(string[] args)
-	{
-	  var builder = Host.CreateDefaultBuilder(args)
-	    .ConfigureServices((hostContext, services) =>
-	    {
-			  services.AddTransient<IMyLogic, MyLogic>();
-	  		services.AddSingleton<MyApp>();
-	    });
-		var app = builder.Build();
-		await app.Services.GetRequiredService<MyApp>().StartAsync();
-		Console.WriteLine("Done!");
-	}
+  static async Task Main(string[] args)
+  {
+    var builder = Host.CreateDefaultBuilder(args)
+      .ConfigureServices((hostContext, services) =>
+      {
+        services.AddTransient<IMyLogic, MyLogic>();
+        services.AddSingleton<MyApp>();
+      });
+    var app = builder.Build();
+    await app.Services.GetRequiredService<MyApp>().StartAsync();
+    Console.WriteLine("Done! Press any key to exit...");
+    Console.ReadKey();
+  }
 }
 ```
 
 ### appsettings.json
 ```
 {
-	"App": {
-		"Value1": "A",
-		"Value2": 1
-	}
+  "App": {
+    "Value1": "A",
+    Value2": 1
+  }
 }
 ```
 
