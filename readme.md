@@ -1,4 +1,87 @@
-Very rough VS Project Template for a .NET Core Console app with Dependency Injection, Configuration and Logging
+
+# Console App
+```
+dotnet new console -n ConsoleApp --use-program-main
+cd .\ConsoleApp\
+dotnet add package Microsoft.Extensions.DependencyInjection
+dotnet add package Microsoft.Extensions.Hosting
+```
+
+```
+public interface IMyLogic
+{
+	void Say(string message);
+}
+
+public class MyLogic : IMyLogic
+{
+	public void Say(string message)
+	{
+		Console.WriteLine(message);
+	}
+}
+
+class MyApp
+{
+	private ILogger<MyApp> _logger;
+	private IConfiguration _config;
+	private IMyLogic _logic;
+
+	public MyApp(ILogger<MyApp> logger, IConfiguration config, IMyLogic logic)
+	{
+		_logger = logger;
+		_config = config;
+		_logic = logic;
+	}
+
+	public Task StartAsync()
+	{
+		_logger.LogInformation(_config["App:Value1"]);
+		_logic.Say("Hello World!");
+		return Task.CompletedTask;
+	}
+}
+
+namespace ConsoleApp;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+class Program
+{
+	static async Task Main(string[] args)
+	{
+	  var builder = Host.CreateDefaultBuilder(args)
+	    .ConfigureServices((hostContext, services) =>
+	    {
+			  services.AddTransient<IMyLogic, MyLogic>();
+	  		services.AddSingleton<MyApp>();
+	    });
+		var app = builder.Build();
+		await app.Services.GetRequiredService<MyApp>().StartAsync();
+		Console.WriteLine("Done!");
+	}
+}
+```
+
+### appsettings.json
+```
+{
+	"App": {
+		"Value1": "A",
+		"Value2": 1
+	}
+}
+```
+
+### Now open your ConsoleApp.csproj file with an editor and add the following block before the </Project> statement at the bottom:
+```
+<ItemGroup>
+	<Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+</ItemGroup>
+```
+
+## Very rough VS Project Template for a .NET Core Console app with Dependency Injection, Configuration and Logging
 
 ![console screenshot of logging and custom config](readme-media/console-logging-workaround.png)
 
